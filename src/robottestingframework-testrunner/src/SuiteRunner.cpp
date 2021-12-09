@@ -175,7 +175,7 @@ bool SuiteRunner::loadSuite(std::string filename)
                 if (test->Attribute("repetition") != nullptr) {
                     char* endptr;
                     auto rep = (unsigned int)strtol(test->Attribute("repetition"), &endptr, 10);
-                    if (endptr == nullptr) {
+                    if (strlen(endptr) == 0) {
                         testcase->setRepetition(rep);
                     } else {
                         string error = Asserter::format("Invalid repetition attribute while loading '%s' at line %d. (%s)",
