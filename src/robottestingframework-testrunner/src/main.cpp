@@ -26,6 +26,7 @@
 
 #include <ErrorLogger.h>
 #include <JUnitOutputter.h>
+#include <JSONOutputter.h>
 #include <SuiteRunner.h>
 #include <Version.h>
 #include <cmdline.h>
@@ -76,7 +77,7 @@ void addOptions(cmdline::parser& cmd)
     cmd.add("no-summary", '\0', "Avoids reporting test summary");
 
     cmd.add<string>("output", 'o', "The output file to save the result. Default is result.txt", false, "");
-    cmd.add<string>("output-type", '\0', "The output file type (text, junit)", false, "text");
+    cmd.add<string>("output-type", '\0', "The output file type (text, json, junit)", false, "text");
 
     cmd.add<string>("param", 'p', "Sets the test case parameters. (Can be used only with --test option.)", false);
     cmd.add<string>("environment", 'e', "Sets the test case environment. (Can be used only with --test option.)", false);
@@ -270,7 +271,15 @@ int main(int argc, char* argv[])
                 cout << endl
                      << msg.getMessage() << ". " << msg.getDetail() << endl;
             }
-        } else {
+        } else if (outptType == "json") {
+            JSONOutputter outputter(collector, cmd.exist("detail"));
+            string output = (cmd.get<string>("output").empty()) ? "result.json" : cmd.get<string>("output");
+            TestMessage msg;
+            if (!outputter.write(output, &msg)) {
+                cout << endl
+                     << msg.getMessage() << ". " << msg.getDetail() << endl;
+            }
+        }  else {
             cout << endl
                  << "Results are not saved! Unknown output type " << outptType << "." << endl;
         }
