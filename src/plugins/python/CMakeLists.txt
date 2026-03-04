@@ -17,18 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-set(RobotTestingFramework_USE_PYTHON_VERSION "" CACHE STRING "Specify python version to use (only Python 2 is supported at the moment)" )
-
-if(RobotTestingFramework_USE_PYTHON_VERSION)
-  if("${RobotTestingFramework_USE_PYTHON_VERSION}" MATCHES "^3")
-    message(SEND_ERROR "Python 3 not supported. Only Python 2 is supported at the moment.")
-  endif()
-  find_package(PythonInterp ${RobotTestingFramework_USE_PYTHON_VERSION} REQUIRED)
-  find_package(PythonLibs ${RobotTestingFramework_USE_PYTHON_VERSION} EXACT REQUIRED)
-else()
-  find_package(PythonInterp REQUIRED)
-  find_package(PythonLibs REQUIRED)
-endif()
+find_package(Python3 3.8 REQUIRED COMPONENTS Interpreter Development)
 
 set(RTF_python_HDRS include/robottestingframework/python/PythonPluginLoader.h)
 
@@ -43,18 +32,18 @@ add_library(RobotTestingFramework::RTF_python ALIAS RTF_python)
 
 target_include_directories(RTF_python PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                                              $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-                                      PRIVATE ${PYTHON_INCLUDE_DIRS})
+                                      PRIVATE ${Python3_INCLUDE_DIRS})
 
 target_link_libraries(RTF_python PUBLIC RobotTestingFramework::RTF
                                         RobotTestingFramework::RTF_dll
-                                 PRIVATE ${PYTHON_LIBRARY})
+                                 PRIVATE Python3::Python)
 
 target_compile_features(RTF_python PUBLIC cxx_nullptr)
 
 set_property(TARGET RTF_python PROPERTY PUBLIC_HEADER ${RTF_python_HDRS})
 
 set_property(TARGET RTF_python PROPERTY OUTPUT_NAME robottestingframework-python)
-set_property(TARGET RTF_python PROPERTY SOVERSION 2)
+set_property(TARGET RTF_python PROPERTY SOVERSION 3)
 
 install(TARGETS RTF_python
         EXPORT RobotTestingFramework
@@ -64,4 +53,14 @@ install(TARGETS RTF_python
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/robottestingframework/python)
 
-
+# Install the robottestingframework Python package (PEP 561 inline stubs).
+# This makes 'import robottestingframework' resolvable by IDEs (VSCode/Pylance,
+# PyCharm, mypy, etc.) so test files get full auto-complete and type checking.
+# At runtime the C++ loader overrides the module in the test's namespace.
+install(DIRECTORY robottestingframework
+        DESTINATION ${Python3_SITELIB}
+        COMPONENT robottestingframework-python
+        FILES_MATCHING
+            PATTERN "*.py"
+            PATTERN "*.pyi"
+            PATTERN "py.typed")

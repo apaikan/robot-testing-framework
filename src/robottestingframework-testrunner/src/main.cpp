@@ -26,6 +26,7 @@
 
 #include <ErrorLogger.h>
 #include <JUnitOutputter.h>
+#include <JSONOutputter.h>
 #include <SuiteRunner.h>
 #include <Version.h>
 #include <cmdline.h>
@@ -76,7 +77,7 @@ void addOptions(cmdline::parser& cmd)
     cmd.add("no-summary", '\0', "Avoids reporting test summary");
 
     cmd.add<string>("output", 'o', "The output file to save the result. Default is result.txt", false, "");
-    cmd.add<string>("output-type", '\0', "The output file type (text, junit)", false, "text");
+    cmd.add<string>("output-type", '\0', "The output file type (text, json, junit)", false, "text");
 
     cmd.add<string>("param", 'p', "Sets the test case parameters. (Can be used only with --test option.)", false);
     cmd.add<string>("environment", 'e', "Sets the test case environment. (Can be used only with --test option.)", false);
@@ -87,6 +88,7 @@ void addOptions(cmdline::parser& cmd)
     cmd.add("detail", 'd', "Enables verbose mode of test assertions.");
     cmd.add("verbose", 'v', "Enables verbose mode.");
     cmd.add("version", '\0', "Shows version information.");
+    cmd.add<string>("python-venv", '\0', "Sets the Python virtual environment path for .py test plugins. (string [=])", false);
 }
 
 
@@ -174,6 +176,11 @@ int main(int argc, char* argv[])
     // create a test runner
     SuiteRunner runner(cmd.exist("verbose"));
     currentRunner = &runner;
+
+    // configure Python venv if provided
+    if (!cmd.get<string>("python-venv").empty()) {
+        runner.setPythonVenv(cmd.get<string>("python-venv"));
+    }
 
     // load a single plugin
     if (cmd.get<string>("test").size()) {
@@ -270,7 +277,15 @@ int main(int argc, char* argv[])
                 cout << endl
                      << msg.getMessage() << ". " << msg.getDetail() << endl;
             }
-        } else {
+        } else if (outptType == "json") {
+            JSONOutputter outputter(collector, cmd.exist("detail"));
+            string output = (cmd.get<string>("output").empty()) ? "result.json" : cmd.get<string>("output");
+            TestMessage msg;
+            if (!outputter.write(output, &msg)) {
+                cout << endl
+                     << msg.getMessage() << ". " << msg.getDetail() << endl;
+            }
+        }  else {
             cout << endl
                  << "Results are not saved! Unknown output type " << outptType << "." << endl;
         }

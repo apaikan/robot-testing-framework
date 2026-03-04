@@ -49,7 +49,9 @@ public:
     /**
      * @brief loadPlugin loads a single test plugin
      * @param filename the plugin file name
+     * @param repetition number of times to repeat the test
      * @param param the optional test case parameter
+     * @param environment the optional test case environment
      * @return true or false upon success or failure
      */
     bool loadPlugin(std::string filename,
@@ -67,6 +69,19 @@ public:
     bool loadMultiplePlugins(std::string path, bool recursive = false);
 
     /**
+     * @brief setPythonVenv sets the Python virtual environment path passed
+     * to all Python (.py) test plugins loaded by this runner.
+     * Has no effect on other plugin types (.so, .lua, .rb, etc.).
+     * @param venvPath absolute path to the venv root directory
+     */
+    void setPythonVenv(const std::string& venvPath);
+
+    /**
+     * @brief getPythonVenv returns the currently configured Python venv path.
+     */
+    const std::string& getPythonVenv() const;
+
+    /**
      * Clear the test list
      */
     void reset();
@@ -79,6 +94,7 @@ private:
 
 private:
     bool verbose;
+    std::string pythonVenv;
 };
 
 #endif // ROBOTTESTINGFRAMEWORK_PLUGINRUNNER_H

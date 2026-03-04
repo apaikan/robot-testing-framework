@@ -17,14 +17,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.13)
 project(RobotTestingFramework
-        VERSION 2.0.1
+        VERSION 2.0.101
+        DESCRIPTION "Robot Testing Framework"
         LANGUAGES C CXX)
-# FIXME CMake 3.9 these variables are handled by "project"
-set(CMAKE_PROJECT_DESCRIPTION "Robot Testing Framework")
-set(PROJECT_DESCRIPTION "${CMAKE_PROJECT_DESCRIPTION}")
-set(RobotTestingFramework_DESCRIPTION "${CMAKE_PROJECT_DESCRIPTION}")
+set(RobotTestingFramework_DESCRIPTION "${PROJECT_DESCRIPTION}")
 
 # enforce the use of C++11
 set(CMAKE_CXX_EXTENSIONS OFF)

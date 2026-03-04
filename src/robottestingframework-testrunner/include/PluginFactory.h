@@ -45,7 +45,8 @@ class PluginFactory
 {
 
 public:
-    static robottestingframework::plugin::PluginLoader* createByType(std::string type)
+    static robottestingframework::plugin::PluginLoader* createByType(std::string type,
+                                                                      const std::string& pythonVenv = "")
     {
         if (compare(type.c_str(), "dll"))
             return new robottestingframework::plugin::DllPluginLoader();
@@ -54,8 +55,13 @@ public:
             return new robottestingframework::plugin::LuaPluginLoader();
 #endif
 #ifdef ENABLE_PYTHON_PLUGIN
-        if (compare(type.c_str(), "python"))
-            return new robottestingframework::plugin::PythonPluginLoader();
+        if (compare(type.c_str(), "python")) {
+            auto* loader = new robottestingframework::plugin::PythonPluginLoader();
+            if (!pythonVenv.empty()) {
+                loader->setVenv(pythonVenv);
+            }
+            return loader;
+        }
 #endif
 #ifdef ENABLE_RUBY_PLUGIN
         if (compare(type.c_str(), "ruby"))
@@ -64,14 +70,20 @@ public:
         return nullptr;
     }
 
-    static robottestingframework::plugin::PluginLoader* createByName(std::string name)
+    static robottestingframework::plugin::PluginLoader* createByName(std::string name,
+                                                                      const std::string& pythonVenv = "")
     {
 #ifdef ENABLE_PYTHON_PLUGIN
         // check for .py
         if (name.size() > 2) {
             std::string ext = name.substr(name.size() - 3, 3);
-            if (PluginFactory::compare(ext.c_str(), ".py"))
-                return new robottestingframework::plugin::PythonPluginLoader();
+            if (PluginFactory::compare(ext.c_str(), ".py")) {
+                auto* loader = new robottestingframework::plugin::PythonPluginLoader();
+                if (!pythonVenv.empty()) {
+                    loader->setVenv(pythonVenv);
+                }
+                return loader;
+            }
         }
 #endif
 

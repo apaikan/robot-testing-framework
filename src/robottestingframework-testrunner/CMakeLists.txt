@@ -23,6 +23,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h.in"
 
 set(RTF_testrunner_HDRS include/ErrorLogger.h
                         include/JUnitOutputter.h
+                        include/JSONOutputter.h
                         include/PlatformDir.h
                         include/PluginFactory.h
                         include/PluginRunner.h
@@ -32,6 +33,7 @@ set(RTF_testrunner_HDRS include/ErrorLogger.h
 
 set(RTF_testrunner_SRCS src/ErrorLogger.cpp
                         src/JUnitOutputter.cpp
+                        src/JSONOutputter.cpp
                         src/PluginRunner.cpp
                         src/SuiteRunner.cpp
                         src/main.cpp)
