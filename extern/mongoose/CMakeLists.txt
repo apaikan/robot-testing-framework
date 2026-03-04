@@ -29,11 +29,5 @@ add_library(RobotTestingFramework::RTF_mongoose ALIAS RTF_mongoose)
 
 target_include_directories(RTF_mongoose PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 if(NOT WIN32)
-  # See https://gitlab.kitware.com/cmake/cmake/issues/14778
-  # See https://gitlab.kitware.com/cmake/cmake/merge_requests/1524
-  if(NOT ${CMAKE_MINIMUM_REQUIRED_VERSION} VERSION_LESS 3.12)
-    message(AUTHOR_WARNING "CMAKE_MINIMUM_REQUIRED_VERSION is now ${CMAKE_MINIMUM_REQUIRED_VERSION}. object libraries can be used with target_link_libraries now.")
-  endif()
-#   target_link_libraries(RTF_mongoose INTERFACE pthread)
-  set_target_properties(RTF_mongoose PROPERTIES INTERFACE_LINK_LIBRARIES pthread)
+  target_link_libraries(RTF_mongoose INTERFACE pthread)
 endif()

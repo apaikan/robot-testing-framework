@@ -153,9 +153,9 @@ bool SuiteRunner::loadSuite(std::string filename)
             PluginLoader* loader;
             std::string pluginName = test->GetText();
             if (test->Attribute("type") != nullptr) {
-                loader = PluginFactory::createByType(test->Attribute("type"));
+                loader = PluginFactory::createByType(test->Attribute("type"), getPythonVenv());
             } else {
-                loader = PluginFactory::createByName(test->GetText());
+                loader = PluginFactory::createByName(test->GetText(), getPythonVenv());
             }
 
             if (loader == nullptr) {

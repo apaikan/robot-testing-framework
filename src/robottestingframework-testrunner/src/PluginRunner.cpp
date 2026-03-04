@@ -55,12 +55,22 @@ void PluginRunner::reset()
 }
 
 
+void PluginRunner::setPythonVenv(const std::string& venvPath)
+{
+    pythonVenv = venvPath;
+}
+
+const std::string& PluginRunner::getPythonVenv() const
+{
+    return pythonVenv;
+}
+
 bool PluginRunner::loadPlugin(std::string filename,
                               const unsigned int repetition,
                               const std::string param,
                               const string environment)
 {
-    PluginLoader* loader = PluginFactory::createByName(filename);
+    PluginLoader* loader = PluginFactory::createByName(filename, pythonVenv);
     if (loader == nullptr) {
         ErrorLogger::Instance().addError("cannot create any known plug-in loader for " + filename);
         return false;

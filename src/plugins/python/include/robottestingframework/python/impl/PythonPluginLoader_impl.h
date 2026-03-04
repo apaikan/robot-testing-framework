@@ -31,7 +31,7 @@ namespace robottestingframework {
 namespace plugin {
 
 /**
- * @brief The PythonPluginLoaderImpl loads a Pthyon test case plug-in and
+ * @brief The PythonPluginLoaderImpl loads a Python test case plug-in and
  * gives the direct access to the TestCase.
  */
 class PythonPluginLoaderImpl : public robottestingframework::TestCase
@@ -50,10 +50,11 @@ public:
     /**
      * @brief open Loads a test case plugin
      * @param filename the plugin filename
+     * @param venvPath optional Python virtual environment path
      * @return A pointer to the test case loaded from the
      * plugin or a null pointer in case of failure.
      */
-    TestCase* open(const std::string filename);
+    TestCase* open(const std::string& filename, const std::string& venvPath = "");
 
     /**
      * @brief close Unloads the plugin and deletes any
@@ -77,7 +78,7 @@ public:
      * @brief setTestName set the test case name
      * @param name the test case name
      */
-    void setTestName(const std::string name);
+    void setTestName(const std::string& name);
 
     bool setup(int argc, char** argv) override;
 
@@ -92,6 +93,8 @@ public:
     static PyObject* testReport(PyObject* self, PyObject* args);
     static PyObject* testCheck(PyObject* self, PyObject* args);
 
+    static PyMethodDef testPythonMethods[];
+
 private:
     std::string getPythonErrorString();
 
@@ -105,11 +108,14 @@ private:
     PyObject* pyClass;
     PyObject* pyInstance;
     PyObject* pyModuleRobotTestingFramework;
-    PyObject* pyCapsuleRobotTestingFramework;
-    static PyMethodDef testPythonMethods[];
+
+    // Singleton interpreter state: shared across all instances so that
+    // Py_Initialize / Py_Finalize are called only once per process.
+    static int  s_instanceCount;
+    static bool s_venvActivated;
 };
 
-} // namespace robottestingframework
 } // namespace plugin
+} // namespace robottestingframework
 
 #endif // ROBOTTESTINGFRAMEWORK_PYTHONPLUGINLOADER_IMPL_H

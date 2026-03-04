@@ -50,7 +50,7 @@ public:
 
     /**
      * @brief open Loads a test case plugin
-     * @param filename the pyhton plugin filename
+     * @param filename the python plugin filename
      * @return A pointer to the test case loaded from the
      * plugin or a null pointer in case of failure.
      */
@@ -68,8 +68,18 @@ public:
      */
     std::string getLastError() override;
 
+    /**
+     * @brief setVenv sets the Python virtual environment path.
+     * Packages installed in the given venv will be available to
+     * the test plugin at runtime.
+     * @param venvPath absolute path to the virtual environment root
+     * (the directory containing bin/ and lib/).
+     */
+    void setVenv(const std::string& venvPath);
+
 private:
     void* implementation;
+    std::string venvPath;
 };
 
 } // namespace plugin

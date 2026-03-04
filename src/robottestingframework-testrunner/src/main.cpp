@@ -88,6 +88,7 @@ void addOptions(cmdline::parser& cmd)
     cmd.add("detail", 'd', "Enables verbose mode of test assertions.");
     cmd.add("verbose", 'v', "Enables verbose mode.");
     cmd.add("version", '\0', "Shows version information.");
+    cmd.add<string>("python-venv", '\0', "Sets the Python virtual environment path for .py test plugins. (string [=])", false);
 }
 
 
@@ -175,6 +176,11 @@ int main(int argc, char* argv[])
     // create a test runner
     SuiteRunner runner(cmd.exist("verbose"));
     currentRunner = &runner;
+
+    // configure Python venv if provided
+    if (!cmd.get<string>("python-venv").empty()) {
+        runner.setPythonVenv(cmd.get<string>("python-venv"));
+    }
 
     // load a single plugin
     if (cmd.get<string>("test").size()) {
