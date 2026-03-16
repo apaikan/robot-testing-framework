@@ -86,7 +86,8 @@ PythonPluginLoaderImpl::PythonPluginLoaderImpl() :
         pyDict(nullptr),
         pyClass(nullptr),
         pyInstance(nullptr),
-        pyModuleRobotTestingFramework(nullptr)
+        pyModuleRobotTestingFramework(nullptr),
+        m_opened(false)
 {
 }
 
@@ -113,13 +114,21 @@ void PythonPluginLoaderImpl::close()
     pyDict  = nullptr; // borrowed — do not decref
     pyClass = nullptr; // borrowed — do not decref
 
-    // Shut down the interpreter when the last instance is destroyed
-    s_instanceCount--;
-    if (s_instanceCount <= 0) {
-        s_instanceCount  = 0;
-        s_venvActivated  = false;
-        if (Py_IsInitialized()) {
-            Py_Finalize();
+    // Shut down the interpreter when the last instance is destroyed.
+    // Only decrement the count if this instance actually opened successfully
+    // (i.e. incremented the count in open()). A fresh or already-closed
+    // instance must not touch the count — otherwise the spurious decrement
+    // would reach zero and call Py_Finalize() while other instances are
+    // still running.
+    if (m_opened) {
+        m_opened = false;
+        s_instanceCount--;
+        if (s_instanceCount <= 0) {
+            s_instanceCount  = 0;
+            s_venvActivated  = false;
+            if (Py_IsInitialized()) {
+                Py_Finalize();
+            }
         }
     }
 }
@@ -138,6 +147,7 @@ TestCase* PythonPluginLoaderImpl::open(const std::string& filename,
         s_venvActivated = false;
     }
     s_instanceCount++;
+    m_opened = true;
 
     // -----------------------------------------------------------------------
     // Extract directory and base name of the test file

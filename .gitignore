@@ -6,3 +6,4 @@ CMakeLists.txt.user
 CMakeCache.txt
 /CMakeFiles/
 /Testing/
+*.pyc

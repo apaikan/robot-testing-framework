@@ -113,6 +113,10 @@ private:
     // Py_Initialize / Py_Finalize are called only once per process.
     static int  s_instanceCount;
     static bool s_venvActivated;
+
+    // True once this instance has successfully incremented s_instanceCount,
+    // so that close() only decrements the count when it actually owns a slot.
+    bool m_opened;
 };
 
 } // namespace plugin
